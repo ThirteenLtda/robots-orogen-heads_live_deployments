@@ -4,6 +4,6 @@ using_task_library 'canopen_master'
 
 deployment 'heads_live_control' do
     task('sync', 'canopen_master::SyncTask').
-        periodic(0.01)
+        periodic(0.001)
     add_default_logger
 end
