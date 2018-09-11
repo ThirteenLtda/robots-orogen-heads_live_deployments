@@ -1,0 +1,9 @@
+name "heads_live_deployments"
+
+using_task_library 'canopen_master'
+
+deployment 'heads_live_control' do
+    task('sync', 'canopen_master::SyncTask').
+        periodic(0.01)
+    add_default_logger
+end

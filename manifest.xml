@@ -1,0 +1,19 @@
+<package>
+  <description brief="Deployments for the HEADS live system">
+  
+  </description>
+  <author>Sylvain Joyeux/sylvain.joyeux@13robotics.com</author>
+  <license></license>
+  <url>http://</url>
+  <logo>http://</logo>
+  <depend package="base/cmake" />
+  <!--
+   To add any dependencies use the depend tag
+  <depend package="dummy-dependency-0" />
+	...
+  <depend package="dummy-dependency-n-1" />
+  <depend package="dummy-dependency-n" />
+  -->
+  <depend package="drivers/orogen/motors_elmo_ds402" />
+  <depend package="drivers/orogen/canopen_master" />
+</package>
