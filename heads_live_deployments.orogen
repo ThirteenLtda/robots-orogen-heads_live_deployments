@@ -1,8 +1,78 @@
 name "heads_live_deployments"
 
+using_task_library 'canbus'
 using_task_library 'canopen_master'
+using_task_library 'motors_elmo_ds402'
+using_task_library 'imu_advanced_navigation_anpp'
 
-deployment 'heads_live_control' do
+# Base task implementation for the motor driver schedulers
+#
+# It assumes that it has peers called 'yaw_motor_driver', 'pitch_motor_driver'
+# and 'roll_motor_driver'
+task_context 'MotorDriverScheduler' do
+    abstract
+
+    # Reception of SYNC messages, used to timestamp the motor samples
+    input_port 'sync_messages', '/canbus/Message'
+
+    # Joint message coming from the Yaw motor driver
+    input_port 'yaw_joint',   '/base/samples/Joints'
+    # Joint message coming from the Pitch motor driver
+    input_port 'pitch_joint', '/base/samples/Joints'
+    # Joint message coming from the Roll motor driver
+    input_port 'roll_joint',  '/base/samples/Joints'
+
+    # Port used to trigger whenever a new CAN message is received
+    # This will cause the scheduler to update the motor drivers
+    input_port('can_messages', '/canbus/Message').
+        multiplexes
+
+    output_port 'joint_samples', '/base/samples/Joints'
+
+    port_driven :can_messages
+end
+
+# Motor driver implementation that is triggered by an external SYNC generator
+task_context 'SyncMotorDriverScheduler', subclasses: 'MotorDriverScheduler' do
+    port_driven :sync_messages
+end
+
+# Motor driver implementation that is triggered by an IMU
+task_context 'IMUMotorDriverScheduler', subclasses: 'MotorDriverScheduler' do
+    input_port 'imu_samples', '/base/samples/RigidBodyState'
+    port_driven :imu_samples
+end
+
+deployment 'sync_generator' do
+    task('sync', 'canopen_master::SyncTask').
+        periodic(0.001)
+    add_default_logger
+end
+
+deployment 'sync_driven_heads_live_control' do
+    task('sync', 'canopen_master::SyncTask').
+        periodic(0.001).
+        realtime.
+        priority(50)
+
+    task('can0', 'canbus::Task').
+        realtime.
+        priority(45)
+
+    tasks = [
+        task('yaw_motor_r', 'motors_elmo_ds402::ReaderTask'),
+        task('pitch_motor_r', 'motors_elmo_ds402::ReaderTask'),
+        task('roll_motor_r', 'motors_elmo_ds402::ReaderTask')
+    ]
+    scheduler = task('sync_driven_scheduler', 'SyncMotorDriverScheduler').
+        realtime.
+        priority(40)
+    tasks.each { |t| t.slave_of(scheduler) }
+
+    add_default_logger
+end
+
+deployment 'imu_driven_heads_live_control' do
     task('sync', 'canopen_master::SyncTask').
         periodic(0.001)
     add_default_logger
