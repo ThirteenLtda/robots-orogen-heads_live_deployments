@@ -102,9 +102,9 @@ void MotorDriverScheduler::updateHook()
         mReceivedJoints = RECEIVED_NONE;
         if (!_yaw_joint.connected())
             mReceivedJoints |= RECEIVED_YAW;
-        if (_pitch_joint.connected())
+        if (!_pitch_joint.connected())
             mReceivedJoints |= RECEIVED_PITCH;
-        if (_roll_joint.connected())
+        if (!_roll_joint.connected())
             mReceivedJoints |= RECEIVED_ROLL;
     }
 
