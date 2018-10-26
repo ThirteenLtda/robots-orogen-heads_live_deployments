@@ -4,13 +4,13 @@
 
 using namespace heads_live_deployments;
 
-IMUMotorDriverScheduler::IMUMotorDriverScheduler(std::string const& name, TaskCore::TaskState initial_state)
-    : IMUMotorDriverSchedulerBase(name, initial_state)
+IMUMotorDriverScheduler::IMUMotorDriverScheduler(std::string const& name)
+    : IMUMotorDriverSchedulerBase(name)
 {
 }
 
-IMUMotorDriverScheduler::IMUMotorDriverScheduler(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state)
-    : IMUMotorDriverSchedulerBase(name, engine, initial_state)
+IMUMotorDriverScheduler::IMUMotorDriverScheduler(std::string const& name, RTT::ExecutionEngine* engine)
+    : IMUMotorDriverSchedulerBase(name, engine)
 {
 }
 
@@ -38,6 +38,7 @@ bool IMUMotorDriverScheduler::startHook()
 }
 void IMUMotorDriverScheduler::updateHook()
 {
+    // This triggers the motor drivers
     IMUMotorDriverSchedulerBase::updateHook();
 }
 void IMUMotorDriverScheduler::errorHook()

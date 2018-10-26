@@ -1,79 +1,51 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.hpp */
 
-#ifndef HEADS_LIVE_DEPLOYMENTS_MOTORDRIVERSCHEDULER_TASK_HPP
-#define HEADS_LIVE_DEPLOYMENTS_MOTORDRIVERSCHEDULER_TASK_HPP
+#ifndef HEADS_LIVE_DEPLOYMENTS_MOTORWRITERDISPATCHER_TASK_HPP
+#define HEADS_LIVE_DEPLOYMENTS_MOTORWRITERDISPATCHER_TASK_HPP
 
-#include "heads_live_deployments/MotorDriverSchedulerBase.hpp"
+#include "heads_live_deployments/MotorWriterDispatcherBase.hpp"
+#include <base/commands/Joints.hpp>
 
 namespace heads_live_deployments{
 
-    /*! \class MotorDriverScheduler
+    /*! \class MotorWriterDispatcher
      * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
      * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
      * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
-     * Base task implementation for the motor driver schedulers
-
-It assumes that it has peers called 'yaw_motor_driver', 'pitch_motor_driver'
-and 'roll_motor_driver'
+     * 
      * \details
      * The name of a TaskContext is primarily defined via:
      \verbatim
      deployment 'deployment_name'
-         task('custom_task_name','heads_live_deployments::MotorDriverScheduler')
+         task('custom_task_name','heads_live_deployments::MotorWriterDispatcher')
      end
      \endverbatim
      *  It can be dynamically adapted when the deployment is called with a prefix argument.
      */
-    class MotorDriverScheduler : public MotorDriverSchedulerBase
+    class MotorWriterDispatcher : public MotorWriterDispatcherBase
     {
-	friend class MotorDriverSchedulerBase;
+	friend class MotorWriterDispatcherBase;
     protected:
-        RTT::TaskContext *yaw_r_task = nullptr;
-        RTT::TaskContext *pitch_r_task = nullptr;
-        RTT::TaskContext *roll_r_task = nullptr;
 
-        static const int RECEIVED_NONE = 0;
-        static const int RECEIVED_YAW = 1;
-        static const int RECEIVED_PITCH = 2;
-        static const int RECEIVED_ROLL = 4;
-        static const int RECEIVED_ALL =
-            RECEIVED_YAW |
-            RECEIVED_PITCH |
-            RECEIVED_ROLL;
-        int mReceivedJoints;
-        base::Time mPreviousSync;
-        base::Time mLastSync;
 
-        base::JointState mYawSample;
-        base::JointState mPitchSample;
-        base::JointState mRollSample;
-        base::samples::Joints mJointsSample;
-        base::samples::Joints mExportedJoints;
-        void outputJointState();
-
-    private:
-        bool updateJoint(
-            RTT::InputPort<base::samples::Joints>& port,
-            base::JointState& joint,
-            base::Time syncTime);
 
     public:
-        /** TaskContext constructor for MotorDriverScheduler
+        /** TaskContext constructor for MotorWriterDispatcher
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
          * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
          */
-        MotorDriverScheduler(std::string const& name = "heads_live_deployments::MotorDriverScheduler", TaskCore::TaskState initial_state = Stopped);
+        MotorWriterDispatcher(std::string const& name = "heads_live_deployments::MotorWriterDispatcher", TaskCore::TaskState initial_state = Stopped);
 
-        /** TaskContext constructor for MotorDriverScheduler
+        /** TaskContext constructor for MotorWriterDispatcher
          * \param name Name of the task. This name needs to be unique to make it identifiable for nameservices.
          * \param engine The RTT Execution engine to be used for this task, which serialises the execution of all commands, programs, state machines and incoming events for a task.
          * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
          */
-        MotorDriverScheduler(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state = Stopped);
+        MotorWriterDispatcher(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state = Stopped);
 
-        /** Default deconstructor of MotorDriverScheduler
+        /** Default deconstructor of MotorWriterDispatcher
          */
-	~MotorDriverScheduler();
+	~MotorWriterDispatcher();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
@@ -132,6 +104,12 @@ and 'roll_motor_driver'
          * before calling start() again.
          */
         void cleanupHook();
+
+    private:
+        base::commands::Joints joints;
+        base::commands::Joints yaw;
+        base::commands::Joints pitch;
+        base::commands::Joints roll;
     };
 }
 

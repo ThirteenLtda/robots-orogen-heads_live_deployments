@@ -11,4 +11,6 @@
   <depend package="drivers/orogen/canbus" />
   <depend package="drivers/orogen/canopen_master" />
   <depend package="drivers/orogen/imu_advanced_navigation_anpp" />
+  <depend package="control/orogen/heads_control" />
+  <depend package="tools/orogen-slave_scheduler" />
 </package>

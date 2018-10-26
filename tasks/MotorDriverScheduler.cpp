@@ -39,21 +39,21 @@ bool MotorDriverScheduler::startHook()
     if (! MotorDriverSchedulerBase::startHook())
         return false;
 
-    yaw_motor_task   = getPeer("yaw_motor_r");
-    pitch_motor_task = getPeer("pitch_motor_r");
-    roll_motor_task  = getPeer("roll_motor_r");
+    yaw_r_task   = getPeer("yaw_motor_r");
+    pitch_r_task = getPeer("pitch_motor_r");
+    roll_r_task  = getPeer("roll_motor_r");
 
-    if (!yaw_motor_task)
+    if (!yaw_r_task)
     {
         LOG_ERROR_S << "No yaw_motor_r peer" << std::endl;
         return false;
     }
-    if (!pitch_motor_task)
+    if (!pitch_r_task)
     {
         LOG_ERROR_S << "No pitch_motor_r peer" << std::endl;
         return false;
     }
-    if (!roll_motor_task)
+    if (!roll_r_task)
     {
         LOG_ERROR_S << "No roll_motor_r peer" << std::endl;
         return false;
@@ -88,9 +88,9 @@ void MotorDriverScheduler::updateHook()
 {
     MotorDriverSchedulerBase::updateHook();
 
-    yaw_motor_task->update();
-    pitch_motor_task->update();
-    roll_motor_task->update();
+    yaw_r_task->update();
+    pitch_r_task->update();
+    roll_r_task->update();
 
     canbus::Message can_msg;
 

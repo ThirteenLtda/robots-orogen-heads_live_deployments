@@ -4,6 +4,8 @@ using_task_library 'canbus'
 using_task_library 'canopen_master'
 using_task_library 'motors_elmo_ds402'
 using_task_library 'imu_advanced_navigation_anpp'
+using_task_library 'slave_scheduler'
+using_task_library 'heads_control'
 
 # Base task implementation for the motor driver schedulers
 #
@@ -38,7 +40,9 @@ task_context 'SyncMotorDriverScheduler', subclasses: 'MotorDriverScheduler' do
 end
 
 # Motor driver implementation that is triggered by an IMU
-task_context 'IMUMotorDriverScheduler', subclasses: 'MotorDriverScheduler' do
+task_context 'IMUMotorDriverScheduler', subclasses: 'slave_scheduler::OrderedSchedulingTask' do
+    needs_configuration
+     
     input_port 'imu_samples', '/base/samples/RigidBodyState'
     port_driven :imu_samples
 end
@@ -72,8 +76,38 @@ deployment 'sync_driven_heads_live_control' do
     add_default_logger
 end
 
+task_context 'MotorWriterDispatcher' do
+    input_port 'joints', '/base/commands/Joints'
+    output_port 'yaw', '/base/commands/Joints'
+    output_port 'pitch', '/base/commands/Joints'
+    output_port 'roll', '/base/commands/Joints'
+    port_driven
+end
+
 deployment 'imu_driven_heads_live_control' do
-    task('sync', 'canopen_master::SyncTask').
-        periodic(0.001)
+    task('spatial', 'imu_advanced_navigation_anpp::Task').
+        periodic(0.001).
+        realtime.
+        priority(50)
+
+    tasks = [
+        task('sync', 'canopen_master::SyncTask'),
+        task('sync_motor_driver_scheduler', 'SyncMotorDriverScheduler'),
+        task('camera_body_to_inertial', 'heads_control::BodyToInertialTask'),
+        task('base_body_to_inertial', 'heads_control::BodyToInertialTask'),
+        task('ne', 'heads_control::NETask'),
+        task('camera_ref', 'heads_control::CameraReferenceTask'),
+        task('ctpid', 'heads_control::OperationalSpaceCTPIDTask'),
+        task('motor_w_dispatcher', 'MotorWriterDispatcher'),
+        task('yaw_w', 'motors_elmo_ds402::WriterTask'),
+        task('pitch_w', 'motors_elmo_ds402::WriterTask'),
+        task('roll_w', 'motors_elmo_ds402::WriterTask')
+    ]
+
+    scheduler = task('imu_scheduler', 'IMUMotorDriverScheduler').
+        realtime.
+        priority(40)
+    tasks.each { |t| t.slave_of(scheduler) }
+
     add_default_logger
 end
