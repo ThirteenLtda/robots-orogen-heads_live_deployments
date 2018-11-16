@@ -32,6 +32,9 @@ bool MotorDriverScheduler::configureHook()
 
     mJointsSample.resize(1);
     mExportedJoints.resize(3);
+    mExportedJoints.names[0] = "ship_and_heads::heads::joint_base_yaw";
+    mExportedJoints.names[1] = "ship_and_heads::heads::joint_yaw_pitch";
+    mExportedJoints.names[2] = "ship_and_heads::heads::joint_pitch_roll";
     return true;
 }
 bool MotorDriverScheduler::startHook()
