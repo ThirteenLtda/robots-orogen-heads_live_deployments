@@ -7,6 +7,9 @@ using_task_library 'imu_advanced_navigation_anpp'
 using_task_library 'slave_scheduler'
 using_task_library 'heads_control'
 
+PERIOD = 0.002
+LOW_LEVEL_PRIORITY = 10
+
 # Base task implementation for the motor driver schedulers
 #
 # It assumes that it has peers called 'yaw_motor_driver', 'pitch_motor_driver'
@@ -49,19 +52,19 @@ end
 
 deployment 'sync_generator' do
     task('sync', 'canopen_master::SyncTask').
-        periodic(0.001)
+        periodic(PERIOD)
     add_default_logger
 end
 
 deployment 'sync_driven_heads_live_control' do
     task('sync', 'canopen_master::SyncTask').
-        periodic(0.001).
+        periodic(PERIOD).
         realtime.
-        priority(50)
+        priority(LOW_LEVEL_PRIORITY)
 
     task('can0', 'canbus::Task').
         realtime.
-        priority(45)
+        priority(LOW_LEVEL_PRIORITY)
 
     tasks = [
         task('yaw_motor_r', 'motors_elmo_ds402::ReaderTask'),
@@ -70,7 +73,7 @@ deployment 'sync_driven_heads_live_control' do
     ]
     scheduler = task('sync_driven_scheduler', 'SyncMotorDriverScheduler').
         realtime.
-        priority(40)
+        priority(LOW_LEVEL_PRIORITY-1)
     tasks.each { |t| t.slave_of(scheduler) }
 
     add_default_logger
@@ -86,9 +89,9 @@ end
 
 deployment 'imu_driven_heads_live_control' do
     task('spatial', 'imu_advanced_navigation_anpp::Task').
-        periodic(0.001).
+        periodic(PERIOD).
         realtime.
-        priority(50)
+        priority(LOW_LEVEL_PRIORITY)
 
     tasks = [
         task('sync', 'canopen_master::SyncTask'),
@@ -106,7 +109,7 @@ deployment 'imu_driven_heads_live_control' do
 
     scheduler = task('imu_scheduler', 'IMUMotorDriverScheduler').
         realtime.
-        priority(40)
+        priority(LOW_LEVEL_PRIORITY-1)
     tasks.each { |t| t.slave_of(scheduler) }
 
     add_default_logger
