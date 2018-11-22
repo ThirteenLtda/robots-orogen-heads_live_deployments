@@ -1,6 +1,6 @@
 <package>
   <description brief="Deployments for the HEADS live system">
-  
+
   </description>
   <author>Sylvain Joyeux/sylvain.joyeux@13robotics.com</author>
   <license></license>
@@ -12,5 +12,6 @@
   <depend package="drivers/orogen/canopen_master" />
   <depend package="drivers/orogen/imu_advanced_navigation_anpp" />
   <depend package="control/orogen/heads_control" />
+  <depend package="control/orogen/joint_range_safety" />
   <depend package="tools/orogen-slave_scheduler" />
 </package>
