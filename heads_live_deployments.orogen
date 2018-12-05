@@ -98,13 +98,19 @@ end
 deployment 'control_network' do
     task('spatial', 'imu_advanced_navigation_anpp::Task').
         realtime.
-        priority(45)
+        priority(LOW_LEVEL_PRIORITY)
 
-    task('camera_body_to_inertial', 'heads_control::BodyToInertialTask')
-    task('base_body_to_inertial', 'heads_control::BodyToInertialTask')
-    task('ne', 'heads_control::NETask')
-    task('camera_ref', 'heads_control::CameraReferenceTask')
-    task('ctpid', 'heads_control::OperationalSpaceCTPIDTask')
+    tasks = [
+        task('joint_observer', 'heads_control::JointMotionObserverTask'),
+        task('camera_body_to_inertial', 'heads_control::BodyToInertialTask'),
+        task('base_body_to_inertial', 'heads_control::BodyToInertialTask'),
+        task('camera_ref', 'heads_control::CameraReferenceTask'),
+        task('ne', 'heads_control::NETask'),
+        task('ctpid', 'heads_control::OperationalSpaceCTPIDTask')
+    ]
+    tasks.each do |t|
+        t.realtime.priority(LOW_LEVEL_PRIORITY-1)
+    end
 
     add_default_logger.
         periodic(0.020)
