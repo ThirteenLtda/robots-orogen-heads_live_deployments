@@ -11,7 +11,7 @@ using_task_library 'joint_range_safety'
 import_types_from 'base'
 import_types_from 'heads_live_deploymentsTypes.hpp'
 
-PERIOD = 0.005
+PERIOD = 0.003
 LOW_LEVEL_PRIORITY = 10
 
 # Base task implementation for the motor driver schedulers
