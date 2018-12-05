@@ -8,7 +8,10 @@ using_task_library 'slave_scheduler'
 using_task_library 'heads_control'
 using_task_library 'joint_range_safety'
 
-PERIOD = 0.002
+import_types_from 'base'
+import_types_from 'heads_live_deploymentsTypes.hpp'
+
+PERIOD = 0.005
 LOW_LEVEL_PRIORITY = 10
 
 # Base task implementation for the motor driver schedulers
@@ -17,6 +20,8 @@ LOW_LEVEL_PRIORITY = 10
 # and 'roll_motor_driver'
 task_context 'MotorDriverScheduler' do
     abstract
+
+    property 'resync_timeout', '/base/Time'
 
     # Reception of SYNC messages, used to timestamp the motor samples
     input_port 'sync_messages', '/canbus/Message'
@@ -34,8 +39,14 @@ task_context 'MotorDriverScheduler' do
         multiplexes
 
     output_port 'joint_samples', '/base/samples/Joints'
+    output_port 'sync', '/canbus/Message'
+    output_port 'skipped_sync', '/heads_live_deployments/SkippedSync'
+    output_port 'stats', '/heads_live_deployments/MotorSyncStats'
 
     port_driven :can_messages
+    port_driven :sync_messages
+
+    runtime_states :LOST_SYNC
 end
 
 # Motor driver implementation that is triggered by an external SYNC generator
@@ -126,6 +137,7 @@ deployment 'imu_driven_heads_live_control' do
         task('sync', 'canopen_master::SyncTask'),
         task('sync_motor_driver_scheduler', 'SyncMotorDriverScheduler'),
         task('camera_body_to_inertial', 'heads_control::BodyToInertialTask'),
+        task('joint_observer', 'heads_control::JointMotionObserverTask'),
         task('base_body_to_inertial', 'heads_control::BodyToInertialTask'),
         task('ne', 'heads_control::NETask'),
         task('camera_ref', 'heads_control::CameraReferenceTask'),

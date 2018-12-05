@@ -32,6 +32,8 @@ and 'roll_motor_driver'
         RTT::TaskContext *pitch_r_task = nullptr;
         RTT::TaskContext *roll_r_task = nullptr;
 
+        int mIgnoreCounter = 0;
+
         static const int RECEIVED_NONE = 0;
         static const int RECEIVED_YAW = 1;
         static const int RECEIVED_PITCH = 2;
@@ -43,6 +45,8 @@ and 'roll_motor_driver'
         int mReceivedJoints;
         base::Time mPreviousSync;
         base::Time mLastSync;
+        SkippedSync mSkip;
+        MotorSyncStats mStats;
 
         base::JointState mYawSample;
         base::JointState mPitchSample;
@@ -50,6 +54,8 @@ and 'roll_motor_driver'
         base::samples::Joints mJointsSample;
         base::samples::Joints mExportedJoints;
         void outputJointState();
+
+        int initialReceivedJoints() const;
 
     private:
         bool updateJoint(

@@ -8,7 +8,21 @@
  * which case you do not need this file
  */
 
+#include <base/Time.hpp>
+
 namespace heads_live_deployments {
+    struct SkippedSync
+    {
+        base::Time sync_time;
+        base::Time received_at;
+        base::Time ready_at;
+    };
+    struct MotorSyncStats
+    {
+        base::Time time;
+        int64_t lost_sync_periods = 0;
+        int64_t skipped_sync = 0;
+    };
 }
 
 #endif
