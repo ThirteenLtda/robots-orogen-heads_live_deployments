@@ -44,8 +44,11 @@ bool MotorWriterDispatcher::startHook()
 void MotorWriterDispatcher::updateHook()
 {
     while (_joints.read(joints, false) == RTT::NewData) {
+        yaw.time = joints.time;
         yaw.elements[0] = joints.elements[0];
+        pitch.time = joints.time;
         pitch.elements[0] = joints.elements[1];
+        roll.time = joints.time;
         roll.elements[0] = joints.elements[2];
 
         _yaw.write(yaw);
