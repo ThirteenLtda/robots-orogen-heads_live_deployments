@@ -114,6 +114,7 @@ deployment 'control_network' do
         task('camera_body_to_inertial', 'heads_control::BodyToInertialTask'),
         task('base_body_to_inertial', 'heads_control::BodyToInertialTask'),
         task('traj_plan', 'heads_control::TrajectoryPlannerTask'),
+        task('traj_plan_orientation', 'heads_control::TrajectoryPlannerOrientationTask'),
         task('camera_ref', 'heads_control::CameraReferenceTask'),
         task('ne', 'heads_control::NETask'),
         task('ctpid', 'heads_control::OperationalSpaceCTPIDTask')
