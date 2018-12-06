@@ -2,6 +2,7 @@
 
 #include "MotorDriverScheduler.hpp"
 #include <base-logging/Logging.hpp>
+#include <canopen_master/StateMachine.hpp>
 
 using namespace heads_live_deployments;
 
@@ -105,6 +106,44 @@ int MotorDriverScheduler::initialReceivedJoints() const
     return result;
 }
 
+void MotorDriverScheduler::processTrigger()
+{
+    base::Time now = base::Time::now();
+    auto sync_msg = canopen_master::StateMachine::sync();
+    
+    if (state() == LOST_SYNC)
+    {
+        mStats.lost_sync_periods++;
+        mLastSync = now;
+        _sync.write(sync_msg);
+    }
+    else if (!mLastSync.isNull())
+    {
+        if (now - mLastSync > _resync_timeout.get())
+        {
+            mStats.lost_sync_periods++;
+            state(LOST_SYNC);
+            _sync.write(sync_msg);
+            mReceivedJoints = initialReceivedJoints();
+        }
+        else
+        {
+            mSkip.sync_time = now;
+            mSkip.received_at = base::Time::now();
+            mStats.skipped_sync++;
+        }
+    }
+    else
+    {
+        mLastSync = now;
+        _sync.write(sync_msg);
+        mReceivedJoints = initialReceivedJoints();
+    }
+
+    mStats.time = base::Time::now();
+    _stats.write(mStats);
+}
+
 void MotorDriverScheduler::updateHook()
 {
     MotorDriverSchedulerBase::updateHook();
@@ -116,43 +155,14 @@ void MotorDriverScheduler::updateHook()
     canbus::Message can_msg;
 
     // We ever only consider the latest message
-    if (_sync_messages.read(can_msg) == RTT::NewData)
+    if (_imu_messages.connected())
     {
-        if (state() == LOST_SYNC)
-        {
-            mStats.lost_sync_periods++;
-            mLastSync = can_msg.time;
-            _sync.write(can_msg);
-        }
-        else if (!mLastSync.isNull())
-        {
-            if (can_msg.time - mLastSync > _resync_timeout.get())
-            {
-                mStats.lost_sync_periods++;
-                state(LOST_SYNC);
-                _sync.write(can_msg);
-                std::cout << "Sync lost " << mReceivedJoints << " " <<
-                    can_msg.time.toMilliseconds() << " " <<
-                    mLastSync.toMilliseconds() << std::endl;
-                mReceivedJoints = initialReceivedJoints();
-            }
-            else
-            {
-                mSkip.sync_time = can_msg.time;
-                mSkip.received_at = base::Time::now();
-                mStats.skipped_sync++;
-            }
-        }
-        else
-        {
-            mLastSync = can_msg.time;
-            _sync.write(can_msg);
-            mReceivedJoints = initialReceivedJoints();
-        }
-
-        mStats.time = base::Time::now();
-        _stats.write(mStats);
+        base::samples::RigidBodyState rbs;
+        if (_imu_messages.read(rbs, false) == RTT::NewData)
+            processTrigger();
     }
+    else if (_sync_messages.read(can_msg) == RTT::NewData)
+        processTrigger();
 
     if (!(mReceivedJoints & RECEIVED_YAW))
     {
@@ -181,7 +191,6 @@ void MotorDriverScheduler::updateHook()
             _yaw_joint.clear();
             _pitch_joint.clear();
             _roll_joint.clear();
-            std::cout << "Reset from LOST_SYNC " << mLastSync.toMilliseconds() << std::endl;
             state(RUNNING);
             mIgnoreCounter = 1;
         }

@@ -56,6 +56,7 @@ and 'roll_motor_driver'
         void outputJointState();
 
         int initialReceivedJoints() const;
+        void processTrigger();
 
     private:
         bool updateJoint(
