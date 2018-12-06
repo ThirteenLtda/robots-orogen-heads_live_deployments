@@ -34,14 +34,14 @@ namespace heads_live_deployments{
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
          * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
          */
-        MotorWriterDispatcher(std::string const& name = "heads_live_deployments::MotorWriterDispatcher", TaskCore::TaskState initial_state = Stopped);
+        MotorWriterDispatcher(std::string const& name = "heads_live_deployments::MotorWriterDispatcher");
 
         /** TaskContext constructor for MotorWriterDispatcher
          * \param name Name of the task. This name needs to be unique to make it identifiable for nameservices.
          * \param engine The RTT Execution engine to be used for this task, which serialises the execution of all commands, programs, state machines and incoming events for a task.
-         * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
+         * 
          */
-        MotorWriterDispatcher(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state = Stopped);
+        MotorWriterDispatcher(std::string const& name, RTT::ExecutionEngine* engine);
 
         /** Default deconstructor of MotorWriterDispatcher
          */

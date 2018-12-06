@@ -4,13 +4,13 @@
 
 using namespace heads_live_deployments;
 
-MotorWriterDispatcher::MotorWriterDispatcher(std::string const& name, TaskCore::TaskState initial_state)
-    : MotorWriterDispatcherBase(name, initial_state)
+MotorWriterDispatcher::MotorWriterDispatcher(std::string const& name)
+    : MotorWriterDispatcherBase(name)
 {
 }
 
-MotorWriterDispatcher::MotorWriterDispatcher(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state)
-    : MotorWriterDispatcherBase(name, engine, initial_state)
+MotorWriterDispatcher::MotorWriterDispatcher(std::string const& name, RTT::ExecutionEngine* engine)
+    : MotorWriterDispatcherBase(name, engine)
 {
 }
 
@@ -43,8 +43,6 @@ bool MotorWriterDispatcher::startHook()
 }
 void MotorWriterDispatcher::updateHook()
 {
-    MotorWriterDispatcherBase::updateHook();
-
     while (_joints.read(joints, false) == RTT::NewData) {
         yaw.elements[0] = joints.elements[0];
         pitch.elements[0] = joints.elements[1];
@@ -54,6 +52,10 @@ void MotorWriterDispatcher::updateHook()
         _pitch.write(pitch);
         _roll.write(roll);
     }
+
+    // Call updateHook after the dispatch, it will schedule
+    // the other tasks
+    MotorWriterDispatcherBase::updateHook();
 }
 void MotorWriterDispatcher::errorHook()
 {

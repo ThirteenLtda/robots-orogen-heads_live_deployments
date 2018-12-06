@@ -58,7 +58,7 @@ deployment 'sync_generator' do
     add_default_logger
 end
 
-task_context 'MotorWriterDispatcher' do
+task_context 'MotorWriterDispatcher', subclasses: 'slave_scheduler::OrderedSchedulingTask' do
     input_port 'joints', '/base/commands/Joints'
     output_port 'yaw', '/base/commands/Joints'
     output_port 'pitch', '/base/commands/Joints'
@@ -90,11 +90,19 @@ deployment 'motor_drivers' do
         priority(LOW_LEVEL_PRIORITY-1)
     tasks.each { |t| t.slave_of(scheduler) }
 
-    task('motor_w_dispatcher', 'MotorWriterDispatcher')
-    task('motor_w_limiter', 'joint_range_safety::ConstantPositionEnforcer')
-    task('yaw_w', 'motors_elmo_ds402::WriterTask')
-    task('pitch_w', 'motors_elmo_ds402::WriterTask')
-    task('roll_w', 'motors_elmo_ds402::WriterTask')
+    task('motor_w_limiter', 'joint_range_safety::ConstantPositionEnforcer').
+        realtime.
+        priority(LOW_LEVEL_PRIORITY-1)
+
+    tasks = [
+        task('yaw_w', 'motors_elmo_ds402::WriterTask'),
+        task('pitch_w', 'motors_elmo_ds402::WriterTask'),
+        task('roll_w', 'motors_elmo_ds402::WriterTask')
+    ]
+    dispatcher = task('motor_w_dispatcher', 'MotorWriterDispatcher').
+        realtime.
+        priority(LOW_LEVEL_PRIORITY-1)
+    tasks.each { |t| t.slave_of(dispatcher) }
 
     add_default_logger.
         periodic(0.020)
