@@ -13,5 +13,6 @@
   <depend package="drivers/orogen/imu_advanced_navigation_anpp" />
   <depend package="control/orogen/heads_control" />
   <depend package="control/orogen/joint_range_safety" />
+  <depend package="control/orogen/joint_tools" />
   <depend package="tools/orogen-slave_scheduler" />
 </package>

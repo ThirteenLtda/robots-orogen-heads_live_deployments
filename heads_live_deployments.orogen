@@ -7,6 +7,7 @@ using_task_library 'imu_advanced_navigation_anpp'
 using_task_library 'slave_scheduler'
 using_task_library 'heads_control'
 using_task_library 'joint_range_safety'
+using_task_library 'joint_tools'
 
 using_library 'canopen_master'
 
@@ -110,6 +111,7 @@ end
 
 deployment 'control_network' do
     tasks = [
+        task('effort_pwm_positioner', 'joint_tools::EffortPWMPositionerTask'),
         task('joint_observer', 'heads_control::JointMotionObserverTask'),
         task('camera_body_to_inertial', 'heads_control::BodyToInertialTask'),
         task('base_body_to_inertial', 'heads_control::BodyToInertialTask'),
