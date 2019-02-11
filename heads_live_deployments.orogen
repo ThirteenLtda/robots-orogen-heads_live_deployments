@@ -120,6 +120,7 @@ deployment 'control_network' do
         task('camera_ref', 'heads_control::CameraReferenceTask'),
         task('ne', 'heads_control::NETask'),
         task('ctpid', 'heads_control::OperationalSpaceCTPIDTask'),
+        task('joint_ctpid', 'heads_control::JointSpaceCTPIDTask'),
         task('ppi', 'heads_control::JointSpacePPITask'),
         task('operational_to_joint_space', 'heads_control::OperationalToJointSpaceTask'),
         task('friction_compensation', 'heads_control::FrictionCompensationTask')
