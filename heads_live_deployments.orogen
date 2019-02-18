@@ -112,7 +112,11 @@ end
 deployment 'control_network' do
     tasks = [
         task('effort_pwm_positioner', 'joint_tools::EffortPWMPositionerTask'),
-        task('joint_observer', 'heads_control::JointMotionObserverTask'),
+        task('joint_obs', 'heads_control::JointMotionObserverTask'),
+        task('joint_obs_1', 'heads_control::JointMotionObserverTask'),
+        task('joint_obs_2', 'heads_control::JointMotionObserverTask'),
+        task('joint_obs_3', 'heads_control::JointMotionObserverTask'),
+        task('joint_obs_4', 'heads_control::JointMotionObserverTask'),
         task('camera_body_to_inertial', 'heads_control::BodyToInertialTask'),
         task('base_body_to_inertial', 'heads_control::BodyToInertialTask'),
         task('traj_plan', 'heads_control::TrajectoryPlannerTask'),
@@ -123,6 +127,12 @@ deployment 'control_network' do
         task('joint_ctpid', 'heads_control::JointSpaceCTPIDTask'),
         task('ppi', 'heads_control::JointSpacePPITask'),
         task('operational_to_joint_space', 'heads_control::OperationalToJointSpaceTask'),
+        task('joint_ref', 'heads_control::JointMotionReferenceTask'),
+        task('friction_identification', 'heads_control::FrictionIdentificationTask'),
+        task('joints_to_time', 'heads_control::JointsToTimeTask'),
+        task('yaw_joint_pid', 'heads_control::JointPIDTask'),
+        task('pitch_joint_pid', 'heads_control::JointPIDTask'),
+        task('roll_joint_pid', 'heads_control::JointPIDTask'),
         task('friction_compensation', 'heads_control::FrictionCompensationTask')
     ]
     tasks.each do |t|
