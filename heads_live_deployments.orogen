@@ -130,10 +130,15 @@ deployment 'control_network' do
         task('operational_to_joint_space', 'heads_control::OperationalToJointSpaceTask'),
         task('joint_ref', 'heads_control::JointMotionReferenceTask'),
         task('friction_identification', 'heads_control::FrictionIdentificationTask'),
+        task('joint_friction_identification_constant_effort', 'heads_control::JointFrictionIdentificationConstantEffortTask'),
+        task('joint_friction_identification_sine_effort', 'heads_control::JointFrictionIdentificationSineEffortTask'),
+        task('joint_friction_identification_constant_velocity', 'heads_control::JointFrictionIdentificationConstantVelocityTask'),
         task('joints_to_time', 'heads_control::JointsToTimeTask'),
         task('yaw_joint_pid', 'heads_control::JointPIDTask'),
         task('pitch_joint_pid', 'heads_control::JointPIDTask'),
         task('roll_joint_pid', 'heads_control::JointPIDTask'),
+        task('joint_to_joints', 'heads_control::JointToJointsTask'),
+        task('joints_to_joint', 'heads_control::JointsToJointTask'),
         task('friction_compensation', 'heads_control::FrictionCompensationTask')
     ]
     tasks.each do |t|
