@@ -141,6 +141,9 @@ void MotorDriverScheduler::processTrigger()
     }
 
     mStats.time = base::Time::now();
+    mStats.last_sync = mLastSync;
+    mStats.received_joints = mReceivedJoints;
+    mStats.last_output_sample = mPreviousSync;
     _stats.write(mStats);
 }
 

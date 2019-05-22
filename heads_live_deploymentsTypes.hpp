@@ -20,8 +20,11 @@ namespace heads_live_deployments {
     struct MotorSyncStats
     {
         base::Time time;
+        base::Time last_sync;
+        base::Time last_output_sample;
         int64_t lost_sync_periods = 0;
         int64_t skipped_sync = 0;
+        int8_t received_joints = 0;
     };
 }
 
